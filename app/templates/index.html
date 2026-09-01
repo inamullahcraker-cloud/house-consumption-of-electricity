@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Consumption Predictor</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="card" style="max-width: 650px;">
+        <h2>7-Day Consumption Predictor</h2>
+        <p>Enter the last 7 days of consumption (in kW):</p>
+        
+        <form id="predictForm">
+            <div class="input-grid">
+                <input type="number" step="0.01" placeholder="Day 1" value="2.1" required>
+                <input type="number" step="0.01" placeholder="Day 2" value="2.4" required>
+                <input type="number" step="0.01" placeholder="Day 3" value="1.9" required>
+                <input type="number" step="0.01" placeholder="Day 4" value="2.8" required>
+                <input type="number" step="0.01" placeholder="Day 5" value="3.0" required>
+                <input type="number" step="0.01" placeholder="Day 6" value="2.7" required>
+                <input type="number" step="0.01" placeholder="Day 7" value="3.1" required>
+            </div>
+            <button type="submit">Predict & Plot Next Day</button>
+        </form>
+
+        <div style="margin-top: 20px;">
+            <canvas id="consumptionChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let chartInstance = null; // Store chart instance for destruction on re-submit
+
+        document.getElementById('predictForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Collect numerical inputs
+            const inputs = Array.from(e.target.querySelectorAll('input')).map(i => parseFloat(i.value));
+            
+            // Send API Request to FastAPI backend
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ days: inputs })
+            });
+
+            const data = await response.json();
+            const predictedVal = data.predicted_power;
+
+            // Render/Update Chart.js visualization
+            renderChart(inputs, predictedVal);
+        });
+
+        function renderChart(historicalInputs, predictedValue) {
+            const ctx = document.getElementById('consumptionChart').getContext('2d');
+
+            // Destroy existing chart instance to prevent render overlapping on update
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            // Prepare datasets: Connect historical line smoothly to prediction line at Day 7
+            const labels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7', 'Day 8 (Pred)'];
+            const historicalData = [...historicalInputs, null];
+            const predictedData = [null, null, null, null, null, null, historicalInputs[6], predictedValue];
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Historical Input (kW)',
+                            data: historicalData,
+                            borderColor: '#007bff',
+                            backgroundColor: '#007bff',
+                            tension: 0.2,
+                            fill: false
+                        },
+                        {
+                            label: 'Forecast (Day 8)',
+                            data: predictedData,
+                            borderColor: '#ff4d4f',
+                            backgroundColor: '#ff4d4f',
+                            borderDash: [5, 5], // Dashed line to indicate prediction
+                            pointRadius: 6,
+                            tension: 0.2,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Predicted Day 8 Load: ${predictedValue} kW`
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Power Consumption (kW)' },
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
