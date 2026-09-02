@@ -27,11 +27,20 @@ An end-to-end time-series demand forecasting application built with PyTorch and 
 
 ```text
 power_app/
-├── main.py            # FastAPI backend server & inference API
-├── model.pt           # Trained PyTorch model checkpoint
-├── scaler.pkl         # Pre-fitted MinMaxScaler for feature scaling
+├── app/
+│   ├── __init__.py
+│   ├── main.py             # FastAPI app initialization and route definitions
+│   ├── model.py            # PyTorch LSTM network architecture
+│   ├── schemas.py          # Pydantic request/response data validation
+│   └── predictor.py        # Model loading, feature scaling, & inference pipeline
+├── artifacts/
+│   ├── model.pt            # Serialized PyTorch model state_dict
+│   └── scaler.pkl          # Serialized MinMaxScaler object
 ├── static/
-│   ├── style.css      # Dashboard styling & layout
-│   └── screenshot_prediction.png # Graph screenshot for showcase
-└── templates/
-    └── index.html     # Interactive Chart.js visualizer UI
+│   └── style.css           # Frontend styles and pics of models
+├── templates/
+│   └── index.html          # HTML dashboard with Chart.js integration
+├── data/
+│   └── dataset.csv         # Household power consumption dataset
+├── requirements.txt        # Python dependency manifest
+└── README.md
