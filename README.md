@@ -18,7 +18,7 @@ An end-to-end time-series demand forecasting application built with PyTorch and 
 ---
 
 ## Evalution:
-**Show 200 hundered comparsion of actual and predicted values through line graph
+**Show 200 hundered comparsion of actual and predicted values through line graph**
 |:---:|:---:|
      ![Prediction Graph](static/camparasion.png)
 
