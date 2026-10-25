@@ -1,0 +1,11 @@
+
+# Large local datasets
+/data/household_power_consumption.txt
+
+# Python generated files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/

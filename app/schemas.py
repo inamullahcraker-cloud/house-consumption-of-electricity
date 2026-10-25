@@ -1,7 +1,25 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
+
 class PredictionRequest(BaseModel):
-    days: list[float] = Field(..., min_length=7, max_length=7, description="7-day power consumption history")
+    date_time: datetime = Field(
+        ...,
+        description="Date and time of the current power reading",
+    )
+
+    global_active_power: float = Field(
+        ...,
+        ge=0,
+        description="Current active power consumption in kW",
+    )
+
+
+class ForecastPoint(BaseModel):
+    date_time: datetime
+    predicted_power: float
+
 
 class PredictionResponse(BaseModel):
-    predicted_power: float
+    predictions: list[ForecastPoint]
