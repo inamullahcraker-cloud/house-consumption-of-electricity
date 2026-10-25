@@ -87,7 +87,7 @@ The forecasting application then uses the model iteratively to generate future p
 
 To evaluate forecasting performance, the project includes a comparison between actual and predicted power-consumption values.
 
-![Actual vs Predicted Power Consumption](static/camparasion.png)
+![Actual vs Predicted Power Consumption](static/camparsion.png)
 
 The evaluation graph compares **200 actual observations with their corresponding predicted values**.
 
